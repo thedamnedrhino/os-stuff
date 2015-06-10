@@ -33,15 +33,21 @@
 #include <sys/sysent.h>
 #include <sys/kernel.h>
 #include <sys/systm.h>
+#include <sys/priority.h>
 #include <sys/lock.h>
 #include <sys/mutex.h>
 #include <sys/sched.h>
+
 
 static int
 sys_mfq_add(struct thread *td, void *arg)
 {
 
 	thread_lock(td);
+	if(td->td_pri_class != PRI_TIMESHARE){
+		//todo put a message in the argument, telling the user to use rtprio
+		return 1;
+	}
 	sched_mfq_add(td);
 	thread_unlock(td);
 	return (0);
